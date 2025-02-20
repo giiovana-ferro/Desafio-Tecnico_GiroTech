@@ -1,4 +1,4 @@
-##### Desafio-Tecnico_GiroTech #####
+#### Desafio-Tecnico_GiroTech ####
 
 - In order for the code to work perfectly, you will need to import “fastapi”. You can do this from the Visual Studio Code terminal itself, using “pip istall fastapi uvicorn”. 
 - In order to run this code, you need to run the following command from the VsCode (Visual Studio Code) terminal: uvicorn challenge:app --reload. This will give you a link that you must paste into your browser using “/docs” at the end of the link. From there you can implement the data. By opening the “POST” tab, for example, you can add data that will appear in your link. The link will always correspond to the writing next to the name of the tab you opened. Example: ![alt text](image.png) next to it we can see “/currencies”, which added to the end of the link, also “/docs”, will bring up the data in a cleaner and more readable way.

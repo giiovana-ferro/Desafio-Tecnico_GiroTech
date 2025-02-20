@@ -5,7 +5,7 @@ from typing import List
 
 app = FastAPI()
 
-##### MODELS #####
+#### MODELS ####
 class CurrencyBase(BaseModel):
     name: str
     type: str
@@ -36,7 +36,7 @@ class InvestmentHistoryBase(BaseModel):
 class InvestmentHistory(InvestmentHistoryBase):
     id: int
 
-##### Simulação de banco de dados #####
+#### Simulação de banco de dados ####
 currencies_db = []
 exchange_rates_db = []
 investors_db = []
@@ -47,7 +47,7 @@ exchange_rate_counter = 1
 investors_counter = 1
 investment_counter = 1
 
-# Endpoints POST
+#### Endpoints POST ####
 @app.post("/currencies", response_model=Currency)
 def create_currency(currency: CurrencyBase):
     global currency_counter
@@ -90,7 +90,7 @@ def create_investment(investment: InvestmentHistoryBase):
     investment_counter += 1
     return new_investment
 
-##### Endpoints PUT #####
+#### Endpoints PUT ####
 @app.put("/currencies/{currency_id}", response_model=Currency)
 def update_currency(currency_id: int, updated_currency: CurrencyBase):
     for currency in currencies_db:
@@ -123,7 +123,7 @@ def update_investors(investor_id: int, update_investors: InvestorsBase):
 
     raise HTTPException(status_code=404, detail="Investor not found")
 
-##### Endpoints DELETE #####
+#### Endpoints DELETE ####
 @app.delete("/exchange_rates/old", response_model=List[ExchangeRate])
 def delete_old_exchange_rates():
     """Remove taxas de câmbio com mais de 30 dias"""
@@ -159,7 +159,7 @@ def delete_investor(investor_id: int):
     }
 
 
-##### Endpoints GET #####
+#### Endpoints GET ####
 @app.get("/currencies", response_model=List[Currency])
 def get_currencies():
     return currencies_db
