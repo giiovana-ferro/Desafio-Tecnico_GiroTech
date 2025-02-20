@@ -91,16 +91,6 @@ def create_investment(investment: InvestmentHistoryBase):
     return new_investment
 
 #### Endpoints PUT ####
-@app.put("/currencies/{currency_id}", response_model=Currency)
-def update_currency(currency_id: int, updated_currency: CurrencyBase):
-    for currency in currencies_db:
-        if currency.id == currency_id:
-            currency.name = updated_currency.name
-            currency.type = updated_currency.type
-            return currency  
-    
-    raise HTTPException(status_code=404, detail="Currency not found")
-
 @app.put("/exchange_rates/{exchange_rate_id}", response_model=ExchangeRate)
 def update_exchange_rate(exchange_rate_id: int, updated_rate: ExchangeRateBase):
     for rate in exchange_rates_db:
@@ -112,17 +102,7 @@ def update_exchange_rate(exchange_rate_id: int, updated_rate: ExchangeRateBase):
             return rate
     
     raise HTTPException(status_code=404, detail="Exchange rate not found")
-
-@app.put("/investors/{investor_id}", response_model=Investors)
-def update_investors(investor_id: int, update_investors: InvestorsBase):
-    for investors in investors_db:
-        if investors.id == investor_id:
-            investors.name == update_investors.name
-            investors.email == update_investors.email
-            return investors
-
-    raise HTTPException(status_code=404, detail="Investor not found")
-
+    
 #### Endpoints DELETE ####
 @app.delete("/exchange_rates/old", response_model=List[ExchangeRate])
 def delete_old_exchange_rates():
