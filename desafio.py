@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import List  
 
 app = FastAPI()
 
-# MODELS
+##### MODELS #####
 class CurrencyBase(BaseModel):
     name: str
     type: str
@@ -36,7 +36,7 @@ class InvestmentHistoryBase(BaseModel):
 class InvestmentHistory(InvestmentHistoryBase):
     id: int
 
-# Simulação de banco de dados
+##### Simulação de banco de dados #####
 currencies_db = []
 exchange_rates_db = []
 investors_db = []
@@ -90,8 +90,76 @@ def create_investment(investment: InvestmentHistoryBase):
     investment_counter += 1
     return new_investment
 
+##### Endpoints PUT #####
+@app.put("/currencies/{currency_id}", response_model=Currency)
+def update_currency(currency_id: int, updated_currency: CurrencyBase):
+    for currency in currencies_db:
+        if currency.id == currency_id:
+            currency.name = updated_currency.name
+            currency.type = updated_currency.type
+            return currency  
+    
+    raise HTTPException(status_code=404, detail="Currency not found")
 
-# Endpoints GET
+@app.put("/exchange_rates/{exchange_rate_id}", response_model=ExchangeRate)
+def update_exchange_rate(exchange_rate_id: int, updated_rate: ExchangeRateBase):
+    for rate in exchange_rates_db:
+        if rate.id == exchange_rate_id:
+            rate.date = updated_rate.date
+            rate.daily_variation = updated_rate.daily_variation
+            rate.daily_rate = updated_rate.daily_rate
+            rate.currency_id = updated_rate.currency_id
+            return rate
+    
+    raise HTTPException(status_code=404, detail="Exchange rate not found")
+
+@app.put("/investors/{investor_id}", response_model=Investors)
+def update_investors(investor_id: int, update_investors: InvestorsBase):
+    for investors in investors_db:
+        if investors.id == investor_id:
+            investors.name == update_investors.name
+            investors.email == update_investors.email
+            return investors
+
+    raise HTTPException(status_code=404, detail="Investor not found")
+
+##### Endpoints DELETE #####
+@app.delete("/exchange_rates/old", response_model=List[ExchangeRate])
+def delete_old_exchange_rates():
+    """Remove taxas de câmbio com mais de 30 dias"""
+    limite_data = datetime.now().date() - timedelta(days=30)
+    removidos = [rate for rate in exchange_rates_db if rate.date < limite_data]
+
+    global exchange_rates_db
+    exchange_rates_db = [rate for rate in exchange_rates_db if rate.date >= limite_data]
+
+    if not removidos:
+        raise HTTPException(status_code=404, detail="No old exchange rates found")
+
+    return removidos
+
+@app.delete("/investors/{investor_id}")
+def delete_investor(investor_id: int):
+    """Remove um investidor e todos os seus investimentos"""
+    global investors_db, investments_db  # Para modificar as listas globais
+
+    investor = next((i for i in investors_db if i.id == investor_id), None)
+    
+    if not investor:
+        raise HTTPException(status_code=404, detail="Investor not found")
+
+    investments_to_remove = [inv for inv in investments_db if inv.investor_id == investor_id]
+    investments_db = [inv for inv in investments_db if inv.investor_id != investor_id]
+
+    investors_db = [i for i in investors_db if i.id != investor_id]
+
+    return {
+        "deleted_investor": investor,
+        "deleted_investments": investments_to_remove
+    }
+
+
+##### Endpoints GET #####
 @app.get("/currencies", response_model=List[Currency])
 def get_currencies():
     return currencies_db
